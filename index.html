@@ -1273,39 +1273,23 @@ let voiceEnabled = true;
 function speak(text) {
     if (!voiceEnabled || !("speechSynthesis" in window)) return;
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "pt-BR"; // Langue portugaise brésilienne
-    utterance.pitch = 1.0; // Ton naturel (ajusté pour un accent brésilien)
-    utterance.rate = 1.0; // Vitesse légèrement plus lente pour plus de clarté
-    utterance.volume = 1.0; // Volume standard
-
-    // Sélectionner une voix brésilienne
-    if (availableVoices.length > 0) {
-        // Prioriser une voix brésilienne (ex. Google ou Microsoft pour pt-BR)
-        const brazilianVoice = availableVoices.find(v => 
-            v.lang === "pt-BR" && 
-            (v.name.toLowerCase().includes("brazil") || 
-             v.name.toLowerCase().includes("brasil") || 
-             v.name.toLowerCase().includes("luciana") || // Voix courante pour pt-BR
-             v.name.toLowerCase().includes("francisco")) // Voix masculine pt-BR
-        ) || availableVoices.find(v => v.lang === "pt-BR"); // Fallback sur n'importe quelle voix pt-BR
-        if (brazilianVoice) {
-            utterance.voice = brazilianVoice;
-        } else {
-            console.warn("Aucune voix brésilienne trouvée, utilisation de la voix par défaut pour pt-BR.");
-        }
-    } else {
-        console.warn("Aucune voix chargée, l'API speechSynthesis peut ne pas être prête.");
+    utterance.lang = "pt-BR";
+    utterance.pitch = 0.5;
+    utterance.rate = 1.1;
+    const voices = window.speechSynthesis.getVoices();
+    if (voices.length > 0) {
+        const maleVoice = voices.find(v => v.name.toLowerCase().includes("male") || v.name.toLowerCase().includes("brasilia"));
+        if (maleVoice) utterance.voice = maleVoice;
     }
-
     window.speechSynthesis.speak(utterance);
-    trackClick("SaídaVoz", "Interação", 0);
+    trackClick("VoiceOutput", "Interaksi", 0);
 }
 
 const voiceToggle = document.getElementById("voice-toggle");
 voiceToggle.addEventListener("click", () => {
     voiceEnabled = !voiceEnabled;
     voiceToggle.classList.toggle("disabled", !voiceEnabled);
-    trackClick(voiceEnabled ? "VozAtivada" : "VozDesativada", "Interação", 0);
+    trackClick(voiceEnabled ? "VoiceEnabled" : "VoiceDisabled", "Interaksi", 0);
 });
 
 let speechRecognitionSupported = "SpeechRecognition" in window || "webkitSpeechRecognition" in window;
